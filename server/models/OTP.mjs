@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 import mailSender from '../utils/mailSender'
 
 const OTPSchema = new mongoose.Schema({
@@ -36,4 +36,4 @@ OTPSchema.pre('save', async function (next) {
   next()
 })
 
-module.exports = mongoose.model('OTP', OTPSchema)
+export default mongoose.model('OTP', OTPSchema)
