@@ -5,9 +5,11 @@ import Home from './pages/Home'
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-    </Routes>
+    <div className="w-screen min-h-screen bg-richBlack-900 flex flex-col font-inter">
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
+    </div>
   )
 }
 
