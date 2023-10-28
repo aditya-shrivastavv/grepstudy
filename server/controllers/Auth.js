@@ -123,7 +123,7 @@ exports.signUp = async (req, res) => {
       gender: null,
       dateOfBirth: null,
       about: null,
-      contactNumer: null
+      contactNumber: null
     })
 
     const user = await User.create({
@@ -146,7 +146,7 @@ exports.signUp = async (req, res) => {
     console.log('signUp error: ', error)
     return res.status(500).json({
       success: false,
-      message: 'User cannot be registrered. Please try again'
+      message: 'User cannot be registered. Please try again'
     })
   }
 }
@@ -212,7 +212,7 @@ exports.login = async (req, res) => {
 exports.changePassword = async (req, res) => {
   //get data from req body
   const { oldPassword, newPassword, confirmNewPassword } = req.body
-  //get oldPassword, newPassword, confirmNewPassowrd
+  //get oldPassword, newPassword, confirmNewPassword
   //validation
   //update pwd in DB
   //send mail - Password updated
