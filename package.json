@@ -1,21 +1,13 @@
 {
-  "name": "react-tailwind-css-starter-pack",
-  "version": "0.1.0",
-  "private": true,
+  "name": "grepstudy",
+  "version": "1.0.0",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/thepranaygupta/react-tailwind-css-starter-pack.git"
-  },
-  "author": "Pranay Gupta",
-  "bugs": {
-    "url": "https://github.com/thepranaygupta/react-tailwind-css-starter-pack/issues"
-  },
+  "author": "Aditya Shrivastav",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
