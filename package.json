@@ -12,7 +12,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "cd server && pnpm start",
+    "dev": "concurrently -n \"client,server\" -c \"bgBlue,bgYellow\" \"pnpm start\" \"pnpm server\""
   },
   "eslintConfig": {
     "extends": [
