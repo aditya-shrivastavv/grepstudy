@@ -42,7 +42,11 @@ exports.capturePayment = async (req, res) => {
   const options = {
     amount: amount * 100,
     currency,
-    receipt: Math.random(Date.now()).toString()
+    receipt: Math.random(Date.now()).toString(),
+    notes: {
+      courseId: course_id,
+      userId
+    }
   }
 
   try {
@@ -77,5 +81,55 @@ exports.verifySignature = async (req, res) => {
 
   if (digest === signature) {
     console.log('Payment is authorized')
+
+    const { courseId, userId } = req.body.payload.payment.entity.notes
+
+    try {
+      const enrolledCourse = await Course.findOneAndUpdate(
+        { _id: courseId },
+        { $push: { studentsEnrolled: userId } },
+        { new: true }
+      )
+      if (!enrolledCourse) {
+        return res.status(500).json({
+          success: false,
+          message: 'Course not found'
+        })
+      }
+
+      console.log(enrolledCourse)
+
+      const enrolledStudent = User.findOneAndUpdate(
+        { _id: userId },
+        { $push: { courses: courseId } },
+        { new: true }
+      )
+
+      console.log(enrolledStudent)
+
+      const emailResponse = await mailSender(
+        enrolledStudent.email,
+        'Congratulations! You have successfully enrolled for the course',
+        courseEnrollmentEmail(enrolledStudent.name, enrolledCourse.courseName)
+      )
+
+      console.log(emailResponse)
+
+      return res.status(200).json({
+        success: true,
+        message: 'Signature verified and student enrolled successfully'
+      })
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({
+        success: false,
+        message: error.message
+      })
+    }
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: 'Payment not authorized'
+    })
   }
 }
