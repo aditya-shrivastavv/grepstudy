@@ -2,6 +2,7 @@ const Course = require('../models/Course')
 const Tag = require('./Tag')
 const User = require('../models/User')
 const uploadToCloudinary = require('../utils/uploadToCloudinary')
+const CourseProgress = require('../models/CourseProgress')
 
 exports.createCourse = async (req, res) => {
   try {
@@ -66,8 +67,6 @@ exports.createCourse = async (req, res) => {
       { new: true }
     )
 
-    // Update tag schema
-
     return res.status(200).json({
       success: true,
       message: 'Course created successfully',
@@ -82,7 +81,7 @@ exports.createCourse = async (req, res) => {
   }
 }
 
-exports.showAllCourses = async (req, res) => {
+exports.getAllCourses = async (req, res) => {
   try {
     const allCourses = await Course.find(
       {},
@@ -102,6 +101,50 @@ exports.showAllCourses = async (req, res) => {
       success: true,
       message: 'All courses',
       data: allCourses
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+}
+
+exports.getCourseDetails = async (req, res) => {
+  try {
+    const { courseId } = req.body
+
+    const courseDetails = await Course.findOne({
+      _id: courseId
+    })
+      .populate({
+        path: 'instructor',
+        populate: {
+          path: 'additionalDetails'
+        }
+      })
+      .populate('category')
+      .populate('ratingAndReviews')
+      .populate({
+        path: 'courseContent',
+        populate: {
+          path: 'subSection'
+        }
+      })
+      .exec()
+
+    if (!courseDetails) {
+      return res.status(400).json({
+        success: false,
+        message: `Could not find the course with id: ${courseId}`
+      })
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Course details fetched successfully',
+      data: courseDetails
     })
   } catch (error) {
     console.log(error)
