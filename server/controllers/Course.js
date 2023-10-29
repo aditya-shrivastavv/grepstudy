@@ -1,7 +1,7 @@
 const Course = require('../models/Course')
 const Tag = require('./Tag')
 const User = require('../models/User')
-const uploadImageToCloudinary = require('../utils/imageUploader')
+const uploadToCloudinary = require('../utils/uploadToCloudinary')
 
 exports.createCourse = async (req, res) => {
   try {
@@ -43,7 +43,7 @@ exports.createCourse = async (req, res) => {
       })
     }
 
-    const thumbnailImage = await uploadImageToCloudinary(
+    const thumbnailImage = await uploadToCloudinary(
       thumbnail,
       process.env.FOLDER_NAME
     )
