@@ -1,6 +1,6 @@
-const SubSection = require('../models/SubSection')
 const Section = require('../models/Section')
 const uploadToCloudinary = require('../utils/uploadToCloudinary')
+const SubSection = require('../models/SubSection')
 
 exports.createSubSection = async (req, res) => {
   try {
@@ -16,7 +16,7 @@ exports.createSubSection = async (req, res) => {
 
     const uploadDetails = await uploadToCloudinary(
       video,
-      process.env.FOLDER_NAME
+      process.env.CLOUDINARY_FOLDER_NAME
     )
 
     const SubSectionDetails = await SubSection.create({
@@ -65,7 +65,7 @@ exports.updateSubSection = async (req, res) => {
       const video = req.files.video
       const uploadDetails = await uploadToCloudinary(
         video,
-        process.env.FOLDER_NAME
+        process.env.CLOUDINARY_FOLDER_NAME
       )
       subSection.videoUrl = uploadDetails.secure_url
       subSection.timeDuration = `${uploadDetails.duration}`
