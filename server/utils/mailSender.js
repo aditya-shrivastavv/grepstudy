@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer')
 
 const mailSender = async (email, title, body) => {
   try {
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: process.env.NODEMAILER_MAIL_HOST,
       auth: {
         user: process.env.NODEMAILER_MAIL_USER,
