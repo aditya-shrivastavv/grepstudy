@@ -4,41 +4,48 @@ const OTP = require('../models/OTP')
 const otpGenerator = require('otp-generator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+
 require('dotenv').config()
 
+/**
+ * Sends OTP to a user's email and saves it in the database
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {Response} - A response object with a success status and a message
+ */
 exports.sendOTP = async (req, res) => {
   try {
     const { email } = req.body
 
+    // Check if a user exists with the given email
     const isExistingUser = await User.findOne({ email })
     if (isExistingUser) {
-      return res.status(401).json({
+      return res.status(409).json({
         success: false,
         message: 'User already registered'
       })
     }
 
-    const otp = otpGenerator.generate(6, {
+    // Generate OTP
+    let otp = otpGenerator.generate(6, {
       upperCaseAlphabets: false,
       lowerCaseAlphabets: false,
       specialChars: false
     })
-    console.log('OTP generated: ', otp)
 
-    // Bad Approach
-    let result = await OTP.findOne({ otp: otp })
+    // TODO: Bad Approach: DB call inside a loop
+    let result = await OTP.findOne({ otp })
     while (result) {
       otp = otpGenerator(6, {
         upperCaseAlphabets: false,
         lowerCaseAlphabets: false,
         specialChars: false
       })
-      result = await OTP.findOne({ otp: otp })
+      result = await OTP.findOne({ otp })
     }
 
     const otpPayload = { email, otp }
-    const otpBody = await OTP.create(otpPayload)
-    console.log(otpBody)
+    await OTP.create(otpPayload)
 
     return res.status(200).json({
       success: true,
@@ -85,30 +92,31 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          'Password and ConfirmPassword Value does not match, please try again'
+          'Password and ConfirmPassword Value do not match, please try again'
       })
     }
 
-    //check user already exist or not
+    // Check if a user exists with the given email
     const isExistingUser = await User.findOne({ email })
     if (isExistingUser) {
-      return res.status(400).json({
+      return res.status(409).json({
         success: false,
-        message: 'User is already registered'
+        message: 'User already registered'
       })
     }
 
     const recentOtp = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1)
     console.log('Most recent OTP: ', recentOtp)
 
-    if (recentOtp.length == 0) {
+    if (recentOtp.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'OTP Found'
+        message: 'OTP Not Found'
       })
     }
 
-    if (otp !== recentOtp.otp) {
+    const correctOtp = recentOtp[0].otp
+    if (otp !== correctOtp) {
       return res.status(400).json({
         success: false,
         message: 'Invalid OTP'
@@ -118,7 +126,7 @@ exports.signUp = async (req, res) => {
     //Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    //entry create in DB
+    // Create a profile for the user
     const profileDetails = await Profile.create({
       gender: null,
       dateOfBirth: null,
