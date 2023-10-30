@@ -3,18 +3,18 @@ const nodemailer = require('nodemailer')
 const mailSender = async (email, title, body) => {
   try {
     const transporter = nodemailer.createTransporter({
-      host: process.env.MAIL_HOST,
+      host: process.env.NODEMAILER_MAIL_HOST,
       auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
-      },
+        user: process.env.NODEMAILER_MAIL_USER,
+        pass: process.env.NODEMAILER_MAIL_PASS
+      }
     })
 
     const info = await transporter.sendMail({
       from: 'GrepStudy',
       to: `${email}`,
       subject: `${title}`,
-      html: `${body}`,
+      html: `${body}`
     })
 
     console.log(info)
