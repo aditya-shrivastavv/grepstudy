@@ -1,3 +1,7 @@
+/**
+ * Controller functions for user authentication
+ * @module AuthController
+ */
 const User = require('../models/User')
 const Profile = require('../models/Profile')
 const OTP = require('../models/OTP')
@@ -9,8 +13,8 @@ require('dotenv').config()
 
 /**
  * Sends OTP to a user's email and saves it in the database
- * @param {Request} req
- * @param {Response} res
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
  * @returns {Response} - A response object with a success status and a message
  */
 exports.sendOTP = async (req, res) => {
@@ -61,6 +65,12 @@ exports.sendOTP = async (req, res) => {
   }
 }
 
+/**
+ * Registers a new user
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @returns {Response} - A response object with a success status and a message
+ */
 exports.signUp = async (req, res) => {
   try {
     const {
@@ -106,8 +116,6 @@ exports.signUp = async (req, res) => {
     }
 
     const recentOtp = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1)
-    console.log('Most recent OTP: ', recentOtp)
-
     if (recentOtp.length === 0) {
       return res.status(400).json({
         success: false,
@@ -159,6 +167,12 @@ exports.signUp = async (req, res) => {
   }
 }
 
+/**
+ * Logs in a user
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @returns {Response} - A response object with a success status and a message
+ */
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body
@@ -174,40 +188,39 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'User is not registered, please signUp first'
+        message: 'User is not registered, please sign-up first'
       })
     }
 
-    //generate JWT, after password matching
-    if (await bcrypt.compare(password, user.password)) {
-      const payload = {
-        email: user.email,
-        id: user._id,
-        accountType: user.accountType
-      }
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '2h'
-      })
-      user.token = token
-      user.password = undefined
-
-      //create cookie and send response
-      const options = {
-        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-        httpOnly: true
-      }
-      return res.cookie('token', token, options).status(200).json({
-        success: true,
-        token,
-        user,
-        message: 'Logged in successfully'
-      })
-    } else {
+    // Check Password
+    if (!(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({
         success: false,
         message: 'Password is incorrect'
       })
     }
+
+    const payload = {
+      email: user.email,
+      id: user._id,
+      accountType: user.accountType
+    }
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: '2h'
+    })
+    user.token = token
+    user.password = undefined
+
+    const options = {
+      expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      httpOnly: true
+    }
+    return res.cookie('token', token, options).status(200).json({
+      success: true,
+      token,
+      user,
+      message: 'Logged in successfully'
+    })
   } catch (error) {
     console.log('Login error: ', error)
     return res.status(500).json({
@@ -217,9 +230,15 @@ exports.login = async (req, res) => {
   }
 }
 
+/**
+ * Changes a user's password
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @returns {Response} - A response object with a success status and a message
+ */
 exports.changePassword = async (req, res) => {
   //get data from req body
-  const { oldPassword, newPassword, confirmNewPassword } = req.body
+  // const { oldPassword, newPassword, confirmNewPassword } = req.body
   //get oldPassword, newPassword, confirmNewPassword
   //validation
   //update pwd in DB
