@@ -3,9 +3,15 @@ const User = require('../models/User')
 const Profile = require('../models/Profile')
 const Course = require('../models/Course')
 const CourseProgress = require('../models/CourseProgress')
-const uploadToCloudinary = require('../utils/uploadToCloudinary')
+const { uploadToCloudinary } = require('../utils/uploadToCloudinary')
 const { convertSecondsToDuration } = require('../utils/secToDuration')
 
+/**
+ * Update user profile
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} - JSON response with success status, message and updated user details
+ */
 exports.updateProfile = async (req, res) => {
   try {
     const {
@@ -21,6 +27,7 @@ exports.updateProfile = async (req, res) => {
     const userDetails = await User.findById(id)
     const profile = await Profile.findById(userDetails.additionalDetails)
 
+    // If firstName or lastName needs to be updated.
     const user = await User.findByIdAndUpdate(id, {
       firstName,
       lastName
@@ -52,6 +59,12 @@ exports.updateProfile = async (req, res) => {
   }
 }
 
+/**
+ * Delete user account
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} - JSON response with success status and message
+ */
 exports.deleteAccount = async (req, res) => {
   try {
     const id = req.user.id
@@ -91,6 +104,12 @@ exports.deleteAccount = async (req, res) => {
   }
 }
 
+/**
+ * Get all user details
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} - JSON response with success status, message and user details
+ */
 exports.getAllUserDetails = async (req, res) => {
   try {
     const id = req.user.id
@@ -111,17 +130,24 @@ exports.getAllUserDetails = async (req, res) => {
   }
 }
 
+/**
+ * Update user display picture
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} - JSON response with success status, message and updated user details
+ */
 exports.updateDisplayPicture = async (req, res) => {
   try {
     const displayPicture = req.files.displayPicture
     const userId = req.user.id
+
     const image = await uploadToCloudinary(
       displayPicture,
       process.env.FOLDER_NAME,
       1000,
       1000
     )
-    console.log(image)
+
     const updatedProfile = await User.findByIdAndUpdate(
       { _id: userId },
       { image: image.secure_url },
@@ -140,6 +166,12 @@ exports.updateDisplayPicture = async (req, res) => {
   }
 }
 
+/**
+ * Get enrolled courses for a user
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} - JSON response with success status and enrolled courses data
+ */
 exports.getEnrolledCourses = async (req, res) => {
   try {
     const userId = req.user.id
@@ -206,12 +238,18 @@ exports.getEnrolledCourses = async (req, res) => {
   }
 }
 
+/**
+ * Get instructor dashboard data
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} - JSON response with success status and instructor dashboard data
+ */
 exports.instructorDashboard = async (req, res) => {
   try {
     const courseDetails = await Course.find({ instructor: req.user.id })
 
     const courseData = courseDetails.map((course) => {
-      const totalStudentsEnrolled = course.studentsEnroled.length
+      const totalStudentsEnrolled = course.studentsEnrolled.length
       const totalAmountGenerated = totalStudentsEnrolled * course.price
 
       // Create a new object with the additional fields
