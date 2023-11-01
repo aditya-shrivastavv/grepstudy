@@ -28,11 +28,13 @@ exports.updateProfile = async (req, res) => {
     const profile = await Profile.findById(userDetails.additionalDetails)
 
     // If firstName or lastName needs to be updated.
-    const user = await User.findByIdAndUpdate(id, {
-      firstName,
-      lastName
-    })
-    await user.save()
+    if (firstName || lastName) {
+      const user = await User.findByIdAndUpdate(id, {
+        firstName: firstName || userDetails.firstName,
+        lastName: lastName || userDetails.lastName
+      })
+      await user.save()
+    }
 
     profile.dateOfBirth = dateOfBirth
     profile.about = about
