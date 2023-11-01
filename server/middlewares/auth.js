@@ -3,7 +3,7 @@ require('dotenv').config()
 const User = require('../models/User')
 
 // auth
-exports.auth = async (res, req, next) => {
+exports.auth = async (req, res, next) => {
   try {
     const token =
       req.cookies.token ||
