@@ -16,7 +16,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "server": "cd server && pnpm start",
+    "server": "cd server && pnpm dev",
     "dev": "concurrently -n \"client,server\" -c \"bgBlue,bgYellow\" \"pnpm start\" \"pnpm server\""
   },
   "eslintConfig": {
