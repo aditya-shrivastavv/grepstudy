@@ -1,4 +1,3 @@
-// Import the required modules
 const express = require('express')
 const router = express.Router()
 const {
@@ -9,9 +8,9 @@ const {
 } = require('../controllers/payments')
 const {
   auth,
-  isInstructor,
-  isStudent,
-  isAdmin
+  // isInstructor,
+  isStudent
+  // isAdmin
 } = require('../middlewares/auth')
 router.post('/capturePayment', auth, isStudent, capturePayment)
 router.post('/verifyPayment', auth, isStudent, verifyPayment)
@@ -21,6 +20,5 @@ router.post(
   isStudent,
   sendPaymentSuccessEmail
 )
-// router.post("/verifySignature", verifySignature)
 
 module.exports = router
