@@ -6,13 +6,11 @@ const User = require('../models/User')
 const { uploadToCloudinary } = require('../utils/uploadToCloudinary')
 const CourseProgress = require('../models/CourseProgress')
 const { convertSecondsToDuration } = require('../utils/secToDuration')
-// Function to create a new course
+
 exports.createCourse = async (req, res) => {
   try {
-    // Get user ID from request object
     const userId = req.user.id
 
-    // Get all required fields from request body
     let {
       courseName,
       courseDescription,
@@ -23,7 +21,7 @@ exports.createCourse = async (req, res) => {
       status,
       instructions: _instructions
     } = req.body
-    // Get thumbnail image from request files
+
     const thumbnail = req.files.thumbnailImage
 
     // Convert the tag and instructions from stringified Array to Array
@@ -146,7 +144,7 @@ exports.editCourse = async (req, res) => {
     if (req.files) {
       console.log('thumbnail update')
       const thumbnail = req.files.thumbnailImage
-      const thumbnailImage = await uploadImageToCloudinary(
+      const thumbnailImage = await uploadToCloudinary(
         thumbnail,
         process.env.FOLDER_NAME
       )
